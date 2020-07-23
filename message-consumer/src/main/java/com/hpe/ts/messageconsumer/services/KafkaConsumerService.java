@@ -12,7 +12,7 @@ public class KafkaConsumerService {
 
     private final Logger logger = LoggerFactory.getLogger(KafkaConsumerService.class);
 
-    @KafkaListener(topics = "${message.topic.name}", groupId = "retry", containerFactory = "retryKafkaListenerContainerFactory")
+    @KafkaListener(topics = "${message.topic.name}", groupId = "retry")
     public void onMessage(String message) {
         logger.info(String.format("#### -> Consumed message -> %s", message));
 
