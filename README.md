@@ -6,8 +6,8 @@ Usage:  Set the address of the Bootstrap Server in the appropiate application.pr
 
 On the kafka server create the retry topic and the overflow topic
 
-/usr/hdp/3.1.0.0-78/kafka/bin/kafka-topics.sh --create --zookeeper localhost:5181 --replication-factor 1 --partitions 1 --topic retry-test-overflow
-/usr/hdp/3.1.0.0-78/kafka/bin/kafka-topics.sh --create --zookeeper localhost:5181 --replication-factor 1 --partitions 1 --topic retry-test
+- /usr/hdp/3.1.0.0-78/kafka/bin/kafka-topics.sh --create --zookeeper localhost:5181 --replication-factor 1 --partitions 1 --topic retry-test-overflow
+- /usr/hdp/3.1.0.0-78/kafka/bin/kafka-topics.sh --create --zookeeper localhost:5181 --replication-factor 1 --partitions 1 --topic retry-test
 
 
 
