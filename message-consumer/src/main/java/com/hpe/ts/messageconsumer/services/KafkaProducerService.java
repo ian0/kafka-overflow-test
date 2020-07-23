@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 public class KafkaProducerService {
 
     private static final Logger logger = LoggerFactory.getLogger(KafkaProducerService.class);
-    private static final String TOPIC = "greeting";
+    private static final String TOPIC = "retry-test-overflow";
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
