@@ -1,6 +1,7 @@
 package com.hpe.ts.messageconsumer.config;
 
 import com.hpe.ts.messageconsumer.services.KafkaConsumerService;
+import com.hpe.ts.messageconsumer.services.KafkaProducerService;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -44,8 +45,7 @@ public class KafkaConsumerConfig {
     @Bean
     public KafkaListenerContainerFactory<ConcurrentMessageListenerContainer<String, String>> kafkaListenerContainerFactory(
             @Qualifier("consumerFactory") ConsumerFactory<String, String> consumerFactory,
-            @Qualifier("kafkaRetryTemplate") RetryTemplate kafkaRetryTemplate,
-            @Qualifier("overflowTemplate") KafkaTemplate<String, String> kafkaTemplate
+            @Qualifier("kafkaRetryTemplate") RetryTemplate kafkaRetryTemplate
     ) {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory);
@@ -53,32 +53,15 @@ public class KafkaConsumerConfig {
         factory.setRecoveryCallback(retryContext -> {
             ConsumerRecord consumerRecord = (ConsumerRecord) retryContext.getAttribute("record");
             logger.info("Recovery is called for message {} ", consumerRecord.value());
-            try {
-                ListenableFuture<SendResult<String, String>> send = kafkaTemplate.send("greeting", consumerRecord.key().toString(), "an overflow message");
-                kafkaTemplate.flush();
-                send.get();
-            } catch (Exception e) {
-                logger.info(e.getMessage());
-            }
+            producerService.sendMessage(consumerRecord.value().toString());
 
             return Optional.empty();
         });
         return factory;
     }
 
-    @Bean("overflowTemplate")
-    public KafkaTemplate<String, String> kafkaTemplate() {
-        return new KafkaTemplate<>(producerFactory());
-    }
-
-    @Bean
-    public ProducerFactory<String, String> producerFactory() {
-        Map<String, Object> props = new HashMap<>();
-        props.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-        props.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        props.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        return new DefaultKafkaProducerFactory<>(props);
-    }
+    @Autowired
+    KafkaProducerService producerService;
 
     @Bean
     public SeekToCurrentErrorHandler errorHandler() {
